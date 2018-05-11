@@ -17,30 +17,36 @@ static int Key_Major;
 
 static struct class *Keydrv_class;
 static struct class_device *Key_drv_dev;
-
-static irqreturn_t K1_irqhandler(int irq, void *dev_id)
+typedef struct key_struct
 {
+	int key_number;
+	int key_pressed_time;
+	int key_status;
+	int pin;
+}
+
+static struct key_struct key_list[4]={
+	{1,0,0,S3C2410_GPF0},
+	{2,0,0,S3C2410_GPF2},
+	{3,0,0,S3C2410_GPG3},
+	{4,0,0,S3C2410_GPG11},
+};
+
+static irqreturn_t Key_irqhandler(int irq, void *dev_id)
+{
+	sturct key_struct *key_id;
+	key_id=(struct key_struct *)dev_id; 
+	
+	switch (key_id->key_number)
+	{
+		case 1: //key 1 handler
+		{
+			
+		}
+	}
 	return 0;
 }
 
-
-static irqreturn_t K2_irqhandler(int irq, void *dev_id)
-{
-	return 0;
-}
-
-
-static irqreturn_t K3_irqhandler(int irq, void *dev_id)
-{
-	return 0;
-}
-
-
-
-static irqreturn_t K4_irqhandler(int irq, void *dev_id)
-{
-	return 0;
-}
 
 
 
@@ -48,16 +54,16 @@ static int Key_open(struct inode *inode, struct file *file)
 {
 	//可以加入错误校验机制，如打印等
 	int err;
-	err=request_irq(IRQ_EINT0  , K1_irqhandler , IRQT_BOTHEDGE ,"K1", 1 );
+	err=request_irq(IRQ_EINT0  , Key_irqhandler , IRQT_BOTHEDGE ,"K1", key_list[0] );
 	if(err<0)
 		printk("K1 init err err No. is : %d",err);
-	err=request_irq(IRQ_EINT2  , K2_irqhandler , IRQT_BOTHEDGE ,"K2", 2 );
+	err=request_irq(IRQ_EINT2  , Key_irqhandler , IRQT_BOTHEDGE ,"K2", key_list[1] );
 	if(err<0)
 		printk("K2 init err err No. is : %d",err);
-	err=request_irq(IRQ_EINT11 , K3_irqhandler , IRQT_BOTHEDGE ,"K3", 3 );
+	err=request_irq(IRQ_EINT11 , Key_irqhandler , IRQT_BOTHEDGE ,"K3", key_list[2] );
 	if(err<0)
 		printk("K3 init err err No. is : %d",err);
-	err=request_irq(IRQ_EINT19 , K4_irqhandler , IRQT_BOTHEDGE ,"K4", 4 );
+	err=request_irq(IRQ_EINT19 , Key_irqhandler , IRQT_BOTHEDGE ,"K4", key_list[3] );
 	if(err<0)
 		printk("K4 init err err No. is : %d",err);
 	return 0;
