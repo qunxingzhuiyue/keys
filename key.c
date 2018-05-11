@@ -41,7 +41,20 @@ static irqreturn_t Key_irqhandler(int irq, void *dev_id)
 	{
 		case 1: //key 1 handler
 		{
-			
+
+			break;
+		}
+		case 2:
+		{
+			break;
+		}
+		case 3:
+		{
+			break;
+		}
+		case 4:
+		{
+			break;
 		}
 	}
 	return 0;
@@ -81,10 +94,10 @@ static int Key_READ(struct file *file, char __user *buf, size_t len, loff_t *lof
 int Key_irq_closed(struct inode *inode, struct file *file)
 {
 	
-	free_irq(IRQ_EINT0  , 1);
-	free_irq(IRQ_EINT2  , 2);
-	free_irq(IRQ_EINT11 , 3);
-	free_irq(IRQ_EINT19 , 4);
+	free_irq(IRQ_EINT0  , key_list[0]);
+	free_irq(IRQ_EINT2  , key_list[1]);
+	free_irq(IRQ_EINT11 , key_list[2]);
+	free_irq(IRQ_EINT19 , key_list[3]);
 	return 0;
 }
 
