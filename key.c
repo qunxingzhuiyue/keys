@@ -12,6 +12,7 @@
 #include <asm/io.h>
 #include <asm/arch/regs-gpio.h>
 #include <asm/hardware.h>
+#include <time.h>
 
 static int Key_Major;
 
@@ -20,7 +21,7 @@ static struct class_device *Key_drv_dev;
 typedef struct key_struct
 {
 	int key_number;
-	int key_pressed_time;
+	struct timeval key_pressed_time;
 	int key_status;
 	int pin;
 }
@@ -35,26 +36,54 @@ static struct key_struct key_list[4]={
 static irqreturn_t Key_irqhandler(int irq, void *dev_id)
 {
 	sturct key_struct *key_id;
-	key_id=(struct key_struct *)dev_id; 
+	struct timeval last;
+	unsign int key_val;
+	int err;
 	
-	switch (key_id->key_number)
+	key_id=(struct key_struct *)dev_id; 
+	err=do_gettimeofday(&last);
+	if(s3c2410_gpio_getpin(*key_id->pin)) //key的值为高,上升沿,按键弹起
 	{
-		case 1: //key 1 handler
+		if(err>=0)
 		{
-
-			break;
+			if(((*key_id->key_pressed_time)!=0x0)&&(30<key_val=((((last->tv_sec)-(*key_id->key_pressed_time->tv_sec))*1000+((last->tv_usec)-(*key_id->key_pressed_time->tv_usec))))))
+			{
+				printk("key %d press time: %d ms\n\r" , *key_id->key_number , key_val);
+				*key_id->key_pressed_time->tv_sec=0;
+				*key_id->key_pressed_time->tv_usec=0;
+				switch (key_id->key_number)
+				{
+					case 1: //key 1 handler
+					{
+						
+						break;
+					}
+					case 2:
+					{
+						break;
+					}
+					case 3:
+					{
+						break;
+					}
+					case 4:
+					{
+						break;
+					}
+				}
+			}
+			else      //less then 30ms key , invalid
+				printk("key press invalid\n\r")
 		}
-		case 2:
+		else
+			printk("read key press time error!\n\r");
+	}
+	else     //下降沿，按键按下，开始计时
+	{
+		if(err>=0)
 		{
-			break;
-		}
-		case 3:
-		{
-			break;
-		}
-		case 4:
-		{
-			break;
+			*key_id->key_pressed_time->tv_sec=last->tv_sec;
+			*key_id->key_pressed_time->tv_usec=last->tv_usec;
 		}
 	}
 	return 0;
